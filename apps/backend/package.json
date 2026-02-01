@@ -16,7 +16,6 @@
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
-    "@prisma/client": "^6.17.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
@@ -29,15 +28,16 @@
     "googleapis": "^164.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
-    "nodemailer": "^7.0.10",
-    "prisma": "^6.16.2"
+    "nodemailer": "^7.0.10"
   },
   "devDependencies": {
+    "@prisma/client": "^5.22.0",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.5.2",
     "nodemon": "^3.1.11",
+    "prisma": "^5.22.0",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",

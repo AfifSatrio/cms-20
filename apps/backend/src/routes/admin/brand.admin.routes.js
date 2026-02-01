@@ -45,4 +45,3 @@ r.delete(
 );
 
 export default r;
-S
