@@ -1,7 +1,6 @@
 "use client"
 
 import { DarkModeButton } from "@/components/DarkModeButton"
-import { DollarSign, Gauge, Rocket, Shield } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
