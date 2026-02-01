@@ -1,28 +1,45 @@
 {
-  "name": "web",
-  "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "name": "becms",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "BECMS Backend API",
+  "author": "",
+  "license": "ISC",
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "dev": "nodemon --watch src --ext js,json --exec node src/index.js",
+    "test": "vitest",
+    "db:seed": "node prisma/seed.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
-    "@repo/ui": "*",
-    "next": "16.1.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "@prisma/client": "^6.17.0",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-validator": "^7.3.0",
+    "file-type": "^21.0.0",
+    "google-auth-library": "^10.5.0",
+    "googleapis": "^164.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
+    "prisma": "^6.16.2"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
-    "eslint": "^9.39.1",
-    "typescript": "5.9.2"
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.5.2",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "vitest": "^4.0.14"
   }
 }
