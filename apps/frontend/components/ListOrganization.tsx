@@ -1,5 +1,4 @@
 import { ScrollArea } from './ui/scroll-area'
-import React from 'react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from './ui/card'
 import Organization from './Organization'
 
@@ -11,7 +10,7 @@ const ListOrganization = () => {
             <CardDescription>See all organization here</CardDescription>
         </CardHeader>
         <CardContent>
-            <ScrollArea className="h-[150px] rounded-md border p-4">
+            <ScrollArea className="h-37.5 rounded-md border p-4">
                 <Organization />
             </ScrollArea>
         </CardContent>

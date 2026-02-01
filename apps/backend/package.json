@@ -1,11 +1,12 @@
 {
   "type": "module",
-  "name": "becms",
+  "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
   "description": "BECMS Backend API",
   "author": "",
   "license": "ISC",
+  "private": true,
   "scripts": {
     "dev": "nodemon --watch src --ext js,json --exec node src/index.js",
     "test": "vitest",
@@ -36,7 +37,7 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.5.2",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
