@@ -3,17 +3,26 @@ import { prisma } from "@/lib/prisma"
 import crypto from "crypto"
 import { Resend } from "resend"
 
+// ⛔ PENTING: pastikan ini hanya jalan di Node.js
+export const runtime = "nodejs"
+
 function getResend() {
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY is not set")
+  const apiKey = process.env.RESEND_API_KEY
+
+  // ❗ JANGAN throw error di build
+  if (!apiKey) {
+    console.warn("RESEND_API_KEY is missing")
+    return null
   }
-  return new Resend(process.env.RESEND_API_KEY)
+
+  return new Resend(apiKey)
 }
 
 export async function POST(req: Request) {
   try {
     const { email } = await req.json()
 
+    // response netral (anti email enumeration)
     if (!email) {
       return NextResponse.json({ message: "OK" })
     }
@@ -23,7 +32,6 @@ export async function POST(req: Request) {
     })
 
     if (!user) {
-      // jangan bocorkan apakah email ada
       return NextResponse.json({ message: "OK" })
     }
 
@@ -43,20 +51,29 @@ export async function POST(req: Request) {
       },
     })
 
-    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/set-new-password?token=${token}`
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+    if (!appUrl) {
+      console.warn("NEXT_PUBLIC_APP_URL is missing")
+      return NextResponse.json({ message: "OK" })
+    }
+
+    const resetLink = `${appUrl}/set-new-password?token=${token}`
 
     const resend = getResend()
 
-    await resend.emails.send({
-      from: process.env.FROM_EMAIL!,
-      to: user.email,
-      subject: "Reset your password",
-      html: `
-        <p>You requested to reset your password.</p>
-        <p><a href="${resetLink}">Click here to reset your password</a></p>
-        <p>This link will expire in 1 hour.</p>
-      `,
-    })
+    // 🔥 JANGAN bikin build gagal hanya karena email
+    if (resend) {
+      await resend.emails.send({
+        from: process.env.FROM_EMAIL ?? "no-reply@example.com",
+        to: user.email,
+        subject: "Reset your password",
+        html: `
+          <p>You requested to reset your password.</p>
+          <p><a href="${resetLink}">Click here to reset your password</a></p>
+          <p>This link will expire in 1 hour.</p>
+        `,
+      })
+    }
 
     return NextResponse.json({ message: "OK" })
   } catch (error) {
