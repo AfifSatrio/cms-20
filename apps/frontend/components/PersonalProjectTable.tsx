@@ -1,4 +1,3 @@
-import React from 'react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table'
 import { personalProjectsData } from '@/constants'
 import { ArrowLeftRight, Copy, ExternalLink, Trash2 } from 'lucide-react'

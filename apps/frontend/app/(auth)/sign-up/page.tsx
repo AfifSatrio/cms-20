@@ -1,146 +1,187 @@
-"use client"; 
+"use client";
 
-import { useState } from 'react';
-import { Mail, Eye, EyeOff, User } from "lucide-react"; 
-import { DarkModeButton } from '@/components/DarkModeButton';
-
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Mail, Eye, EyeOff, User } from "lucide-react";
+import { DarkModeButton } from "@/components/DarkModeButton";
 
 const SignUpPage = () => {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (form.password !== form.confirmPassword) {
+      setError("Password dan konfirmasi password tidak sama");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          password: form.password,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Registrasi gagal");
+      }
+
+      router.push("/login?registered=true");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-zinc-900">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-zinc-800">
-        
-       
-        <div className='flex items-center justify-end gap-25 mb-3'>
-          <h1 className="text-center text-3xl font-bold text-gray-900 dark:text-white">
+        <div className="mb-3 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Sign Up
           </h1>
           <DarkModeButton />
         </div>
-        
+
         <p className="mb-6 text-center text-sm text-gray-600 dark:text-gray-300">
           Create an account to get started
         </p>
 
-       
-        <form onSubmit={(e) => e.preventDefault()}>
-          
-        
+        <form onSubmit={handleSubmit}>
+          {/* Full Name */}
           <div className="mb-4">
-            <label 
-              htmlFor="name" 
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
+            <label className="mb-2 block text-sm font-medium">
               Full Name
             </label>
             <div className="relative">
               <input
-                type="text"
                 id="name"
+                value={form.name}
+                onChange={handleChange}
                 placeholder="John Doe"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-zinc-700 dark:text-white dark:placeholder-gray-400"
+                className="w-full rounded-lg border p-3 pr-10"
+                required
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <User className="h-5 w-5" />
-              </span>
+              <User className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             </div>
           </div>
 
-          
+          {/* Email */}
           <div className="mb-4">
-            <label 
-              htmlFor="email" 
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Email
-            </label>
+            <label className="mb-2 block text-sm font-medium">Email</label>
             <div className="relative">
               <input
-                type="email"
                 id="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
                 placeholder="example@email.com"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-zinc-700 dark:text-white dark:placeholder-gray-400"
+                className="w-full rounded-lg border p-3 pr-10"
+                required
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <Mail className="h-5 w-5" />
-              </span>
+              <Mail className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             </div>
           </div>
 
-          
+          {/* Password */}
           <div className="mb-4">
-            <label 
-              htmlFor="password" 
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
+            <label className="mb-2 block text-sm font-medium">
               Password
             </label>
             <div className="relative">
               <input
-                type={showPassword ? "text" : "password"} 
                 id="password"
-                placeholder="Password"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-zinc-700 dark:text-white dark:placeholder-gray-400"
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={handleChange}
+                className="w-full rounded-lg border p-3 pr-10"
+                required
               />
               <button
-                type="button" 
-                onClick={() => setShowPassword(!showPassword)} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
           </div>
 
-         
+          {/* Confirm Password */}
           <div className="mb-4">
-            <label 
-              htmlFor="confirm-password" 
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
+            <label className="mb-2 block text-sm font-medium">
               Confirm Password
             </label>
             <div className="relative">
               <input
-                type={showConfirmPassword ? "text" : "password"} 
-                id="confirm-password"
-                placeholder="Confirm Password"
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pr-10 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-zinc-700 dark:text-white dark:placeholder-gray-400"
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={form.confirmPassword}
+                onChange={handleChange}
+                className="w-full rounded-lg border p-3 pr-10"
+                required
               />
               <button
-                type="button" 
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
+                type="button"
+                onClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
+                className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                {showConfirmPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
           </div>
 
-         
+          {error && (
+            <p className="mb-3 text-sm text-red-500">{error}</p>
+          )}
+
           <button
             type="submit"
-            className="mt-6 w-full rounded-lg bg-green-700 py-3 font-semibold text-white transition-colors hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            disabled={loading}
+            className="mt-6 w-full rounded-lg bg-green-700 py-3 font-semibold text-white hover:bg-green-800"
           >
-            Create Account
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
-       
-        <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-300">
+        <p className="mt-8 text-center text-sm">
           Already have an account?{" "}
-         
-          <a href="/login" className="font-medium text-blue-600 hover:underline dark:text-blue-400">
+          <a href="/login" className="text-blue-600 hover:underline">
             Login
           </a>
         </p>
-
       </div>
     </div>
   );
-}
+};
 
 export default SignUpPage;

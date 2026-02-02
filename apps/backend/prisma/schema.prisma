@@ -80,6 +80,12 @@ enum ModuleKey {
   ALL
 }
 
+enum EmailVerificationStatus {
+  PENDING
+  VERIFIED
+}
+
+
 /// =======================
 /// Subscription lifecycle
 /// =======================
@@ -152,10 +158,13 @@ model User {
   pictureUrl   String?
   status       AccountStatus @default(ACTIVE)
 
+  // ✅ EMAIL VERIFICATION
+  emailVerifiedAt DateTime?
+
   accounts        Account[]
   sessions        Session[]
   workspaces      WorkspaceMember[]
-  workspacesOwned Workspace[]       @relation("UserOwnsWorkspaces")
+  workspacesOwned Workspace[] @relation("UserOwnsWorkspaces")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -163,12 +172,14 @@ model User {
   createdEntries ContentEntry[] @relation("EntryCreatedBy")
   updatedEntries ContentEntry[] @relation("EntryUpdatedBy")
 
-  // back-relation untuk PasswordResetToken.user
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 
-  // back-relation untuk Asset.createdBy
   createdAssets Asset[]
+
+  @@index([email, status])
 }
+
 
 model Account {
   id           String       @id @default(cuid())
@@ -184,14 +195,21 @@ model Account {
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String   @unique
-  userAgent String?
-  ip        String?
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  userAgent    String?
+  ip           String?
+
+  // ✅ REMEMBER ME
+  isPersistent Boolean  @default(false)
+
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 /// Token reset password
@@ -207,6 +225,19 @@ model PasswordResetToken {
 
   @@index([userId, expiresAt])
 }
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
 
 /// =======================
 /// RBAC (Roles & Permissions)
